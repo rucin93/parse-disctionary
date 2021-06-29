@@ -45,17 +45,16 @@ export function pokemonV1(wordlist: Array<string>): string {
           <FROM>v - 5 ?
               // specials
               w += "<SPECIAL_LETTERS>"[v = 5, d & 7]
-          :<TO>
-              d ?
+          :d ?<TO>
                   d < 27 ?
                       // alphabets
                       w += String.fromCharCode(96 + d)
                   :
                       // newlines and delta encoding
                       w = w.substr(console.log(w), d - 27)
-              :
+              <FROM>:
                   // switch to specials (for once)
-                  v = 3
+                  v = 3<TO>
       )
           d = b & 31, // will have some garbages when v < 5
           b >>= v // really shift them out
@@ -66,7 +65,7 @@ export function pokemonV1(wordlist: Array<string>): string {
     js = js.replace("<ENCODED>", encoded);
 
     if (specialLetters === '') {
-        js = js.replace(/<FROM>.*<TO>/g, '');
+        js = js.replace(/<FROM>.*?<TO>/g, '');
     } else {
         js = js.replace("<SPECIAL_LETTERS>", specialLetters);
     }
