@@ -4,5 +4,3 @@ export default function parseCode(words: string): string {
   const wordlist = words.split(`\n`);
   return pokemonV1(wordlist)
 }
-
-

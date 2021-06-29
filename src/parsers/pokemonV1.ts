@@ -42,10 +42,10 @@ export function pokemonV1(wordlist: Array<string>): string {
           b>>v // can we shift at least v bits?
       ;
           // d is the current unit (and some more)
-          v - 5 ?
+          <FROM>v - 5 ?
               // specials
               w += "<SPECIAL_LETTERS>"[v = 5, d & 7]
-          :
+          :<TO>
               d ?
                   d < 27 ?
                       // alphabets
@@ -64,6 +64,11 @@ export function pokemonV1(wordlist: Array<string>): string {
     js = minify(js);
     // replace it here because first replace would fuck encoded / special letters
     js = js.replace("<ENCODED>", encoded);
-    js = js.replace("<SPECIAL_LETTERS>", specialLetters);
+
+    if (specialLetters === '') {
+        js = js.replace(/<FROM>.*<TO>/g, '');
+    } else {
+        js = js.replace("<SPECIAL_LETTERS>", specialLetters);
+    }
     return js;
 }

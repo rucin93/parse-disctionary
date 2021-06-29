@@ -147,7 +147,7 @@ export function encodeBqV1(
 
         let {v, n, widen } = vv[i];
         const nn = widen ? nfullbits : 7;
-        // if (n < nn) {
+        if (n < nn) {
           const m = Math.min(nn - n, nbits);
           v |= (bits & ((1 << m) - 1)) << n;
           n += m;
@@ -165,7 +165,7 @@ export function encodeBqV1(
           if (nbits === 0) {
             break;
           }
-        // }
+        }
 
         i -= 1;
         }
@@ -178,11 +178,7 @@ export function encodeBqV1(
   const total_bytes = chunks.reduce((v, a) => v + (a.length || 0), 0); // 7
   let vv = null;
 
-  while (true) {
-    // console.log("trying", widen_offsets, total_bytes);
-    vv = tryOnce();
-    if (vv) break;
-  }
+  while (!(vv = tryOnce())) {}
 
   const ret = [];
   console.log(vv.length)
