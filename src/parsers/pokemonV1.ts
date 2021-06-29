@@ -67,6 +67,8 @@ export function pokemonV1(wordlist: Array<string>): string {
     if (specialLetters === '') {
         js = js.replace(/<FROM>.*?<TO>/g, '');
     } else {
+        js = js.replace(/<FROM>/g, '');
+        js = js.replace(/<TO>/g, '');
         js = js.replace("<SPECIAL_LETTERS>", specialLetters);
     }
     return js;
