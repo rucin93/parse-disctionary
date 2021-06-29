@@ -1,7 +1,31 @@
+import { readFileSync } from 'fs'
+
 interface item {
   v: any;
   w: any;
   widen: any;
+}
+
+export function readLinesFromFile(filePath: string, separator: string = '\n'): Array<string> {
+  return readFileSync(filePath).toString().split(separator)
+}
+
+export function createTestDictionary(length: number, minWordLength: number,  separator: string = '\n'): string {
+  let temp = ``
+  for(let i = 0; i < length; i++) {
+    // @ts-ignore
+    const stringLength = !!( Math.random() + minWordLength ) * 4
+    for(let j = minWordLength; j < stringLength; j++) {
+      const number = (Math.random() * ('a'.charCodeAt(0) - 'z'.charCodeAt(0))) + 'a'.charCodeAt(0)
+      temp += String.fromCharCode(number)
+    }
+
+    if (i + 1 !== length) {
+      temp += separator
+    }
+  }
+
+  return temp
 }
 
 export function assert(condition: boolean, message: string): boolean {
