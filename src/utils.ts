@@ -6,6 +6,8 @@ interface item {
   widen: any;
 }
 
+const INVALID_OFFSETS_V2 = {13: 0x80, 36: 0x100, 92: 0x180, 96: 0x200}
+
 export function readLinesFromFile(filePath: string, separator: string = '\n'): Array<string> {
   return readFileSync(filePath).toString().split(separator)
 }
@@ -90,6 +92,10 @@ export function quotes(str: string): string {
       ? `'${str.replace(/'/g, "\\'")}'`
       : `"${str.replace(/"/g, '\\"')}"`;
   }
+}
+
+export function minify(s: string): string {
+  return s.replace(/\s|\/\/[^\n]*(?:\n|$)/g, "");
 }
 
 export function encodeBqV1(
@@ -196,3 +202,5 @@ export function encodeBqV1(
   });
   return "`" + ret.join(``) + "`";
 }
+
+

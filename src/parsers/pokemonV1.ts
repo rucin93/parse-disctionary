@@ -1,4 +1,4 @@
-import {encodeBits, encodeBqV1, findSpecialSigns, prefixLen} from "../utils";
+import {encodeBits, encodeBqV1, findSpecialSigns, minify, prefixLen} from "../utils";
 
 export function pokemonV1(wordlist: Array<string>): string {
     const specialLetters = findSpecialSigns(wordlist)
@@ -61,8 +61,7 @@ export function pokemonV1(wordlist: Array<string>): string {
           b >>= v // really shift them out
   `;
 
-    js = js.replace(/\s|\/\/[^\n]*(?:\n|$)/g, ""); // trim all except code
-    js = js.replace(/<SPACE>/g, " "); // add spaces where are needed
+    js = minify(js);
     // replace it here because first replace would fuck encoded / special letters
     js = js.replace("<ENCODED>", encoded);
     js = js.replace("<SPECIAL_LETTERS>", specialLetters);
