@@ -199,4 +199,30 @@ export function encodeBqV1(
   return "`" + ret.join(``) + "`";
 }
 
+export function ord (c:string):number {
+  return c.charCodeAt(0)
+}
 
+export function range (length: number):Array<number> {
+  return Object.keys([...new Array(length)]).map(Number)
+}
+
+export function encode_bq_v2(buf) {
+  const ret = []
+  let offset = 0
+  buf.forEach(v => {
+    if(assert((0 <= v)&& (v < 128), 'v')) {
+      if (offset) {
+        ret.push(offset + v)
+        offset = 0
+      } else if (validByte(v)) {
+        ret.push(v)
+      } else {
+        offset = INVALID_OFFSETS_V2[v]
+      }
+    }
+  })
+
+  assert( offset == 0, 'suboptimal encoding, put more padding bits to solve this issue')
+  return ret.map(e=> e.charCodeAt(0)).join('')
+}
