@@ -31,27 +31,37 @@ export class RANS_ENCODER {
     }
 
     put_back(start, freq, scale) {
-        const value = assert( freq > 0 , 'freq > 0')
-        if (value) {
+        if (assert( freq > 0 , 'freq > 0')) {
             let st = this.st
             let stMax = (RANS_L >> scale << 7) * freq
             while (st >= stMax) {
                 // @ts-ignore
                 this.buffer.push(st & 0x7f)
                 st >>= 7
-                this.st = (~~(st / freq) << scale) + (st % freq) + start
             }
+
+            this.st = ((~~(st / freq)) << scale) + (st % freq) + start
+            // console.log(this.st, freq, scale)
+            // 145965411 [97] 109225 17
+            // 135154277 [ 97 ] 117965 17
         }
     }
 
     done() {
         this.reqs.reverse().map(({start, freq, scale}) => {
             this.put_back(start, freq, scale)
-
         })
 
         const buffer = this.buffer
         const st = this.st
+        //97, 50, 48, 93, 53, 33, 34, 88, 120, 30, 41, 8, 89, 81, 46, 121, 33, 30, 116, 80, 114, 62, 76, 46, 55
+        //97, 51, 87, 32, 41, 87, 37, 71, 39, 53, 81, 96, 104, 44, 127, 104, 24, 127, 111, 12, 10, 112
+        //
+        // 21847 109225 17
+        // 145965411 [97] 109225 17
+        //
+        //13107 117965 17
+        // 135154277 [ 97 ] 117965 17
         this.buffer = this.st = null
 
         return {st: st, buffer: buffer.reverse()}

@@ -3,7 +3,7 @@ import {assert, range} from "./utils";
 export const MODELPREC = 16
 export const MODELMAXCOUNT = 63
 
-export const DIVCOUNT = range(MODELMAXCOUNT + 1).map(count => ~~((2 << MODELPREC) / (2 * count + 1)))
+export const DIVCOUNT = range(MODELMAXCOUNT+1).map(count => ~~((2 << MODELPREC) / (2 * count + 1)))
 
 export class bitwise_model_v1 {
     pred: number
@@ -15,7 +15,8 @@ export class bitwise_model_v1 {
     }
 
     reset() {
-        return new bitwise_model_v1()
+        this.pred = 1 << (MODELPREC - 1)
+        this.count = 0
     }
 
     update(bit) {
@@ -24,7 +25,7 @@ export class bitwise_model_v1 {
         }
         const delta = ((bit << MODELPREC) - this.pred) * DIVCOUNT[this.count]
         if (assert((-0x80000000 <= delta) && (delta <= 0x7fffffff), 'delta')) {
-            this.pred += delta >> MODELPREC
+            this.pred += (delta) >> MODELPREC
         }
     }
 }
@@ -42,7 +43,7 @@ export class charwise_model_v1 {
         this.bit_context = 1
     }
 
-    pred() {
+    get pred() {
         return this.models[this.bit_context].pred
     }
 
@@ -60,7 +61,7 @@ export class context_model_v1 {
     context: number
 
     constructor(model_class, charbits, order) {
-        this.models = range(1 << (charbits * order)).map(i => new model_class(charbits))
+        this.models = range(1 << (charbits * order) + 1).map(i => new model_class(charbits))
         this.context = 0
     }
 
@@ -70,7 +71,7 @@ export class context_model_v1 {
 
     }
 
-    pred() {
+    get pred() {
         return this.models[this.context].pred
     }
 

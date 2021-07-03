@@ -6,7 +6,6 @@ interface item {
   widen: any;
 }
 
-const INVALID_OFFSETS_V2 = {13: 0x80, 36: 0x100, 92: 0x180, 96: 0x200}
 
 export function readLinesFromFile(filePath: string, separator: string = '\n'): Array<string> {
   return readFileSync(filePath).toString().split(separator)
@@ -32,7 +31,7 @@ export function createTestDictionary(length: number, minWordLength: number,  sep
 
 export function assert(condition: boolean, message: string): boolean {
   if (!condition) {
-    console.log(message || "Assertion failed");
+    // console.log(message || "Assertion failed");
     return false;
   }
 
@@ -207,11 +206,13 @@ export function range (length: number):Array<number> {
   return Object.keys([...new Array(length)]).map(Number)
 }
 
+export const INVALID_OFFSETS_V2 = {13: 0x80, 36: 0x100, 92: 0x180, 96: 0x200}
+
 export function encode_bq_v2(buf) {
   const ret = []
   let offset = 0
   buf.forEach(v => {
-    if(assert((0 <= v)&& (v < 128), 'v')) {
+    if(assert((0 <= v) && (v < 128), '')) {
       if (offset) {
         ret.push(offset + v)
         offset = 0
@@ -222,7 +223,6 @@ export function encode_bq_v2(buf) {
       }
     }
   })
-
   assert( offset == 0, 'suboptimal encoding, put more padding bits to solve this issue')
-  return ret.map(e=> e.charCodeAt(0)).join('')
+  return ret.map(e=> String.fromCodePoint(e)).join('')
 }
