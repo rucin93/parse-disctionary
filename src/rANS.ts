@@ -1,4 +1,5 @@
-import {assert} from "./utils";
+import {assert, range} from "./utils";
+import {charwise_model_v1, context_model_v1, MODELPREC} from "./models";
 
 const RANS_L = 1 << (28 - 7)
 
@@ -41,9 +42,6 @@ export class RANS_ENCODER {
             }
 
             this.st = ((~~(st / freq)) << scale) + (st % freq) + start
-            // console.log(this.st, freq, scale)
-            // 145965411 [97] 109225 17
-            // 135154277 [ 97 ] 117965 17
         }
     }
 
@@ -54,18 +52,26 @@ export class RANS_ENCODER {
 
         const buffer = this.buffer
         const st = this.st
-        //97, 50, 48, 93, 53, 33, 34, 88, 120, 30, 41, 8, 89, 81, 46, 121, 33, 30, 116, 80, 114, 62, 76, 46, 55
-        //97, 51, 87, 32, 41, 87, 37, 71, 39, 53, 81, 96, 104, 44, 127, 104, 24, 127, 111, 12, 10, 112
-        //
-        // 21847 109225 17
-        // 145965411 [97] 109225 17
-        //
-        //13107 117965 17
-        // 135154277 [ 97 ] 117965 17
         this.buffer = this.st = null
 
         return {st: st, buffer: buffer.reverse()}
 
+    }
+
+    static compress(words, CODEBITS) {
+        const model = new context_model_v1(charwise_model_v1, CODEBITS, 1)
+        const enc = new RANS_ENCODER()
+        let bit
+        words.forEach(word => {
+            range(CODEBITS).reverse().forEach(i => {
+                bit = word >> i & 1
+                enc.put_bit(bit, model.pred, MODELPREC)
+                model.update(bit)
+            })
+            model.context = word
+        })
+
+        return enc.done()
     }
 }
 
@@ -107,5 +113,26 @@ export class RANS_DECODER {
         }
 
         return bit
+    }
+
+    static decompress(st, buffer, wordsCount, CODEBITS) {
+        const model = new context_model_v1(charwise_model_v1, CODEBITS, 1)
+
+        const dec = new RANS_DECODER(st, buffer)
+        const words = []
+
+        range(wordsCount).forEach(k => {
+            let c = 0
+            range(CODEBITS).reverse().forEach(() => {
+                const bit = dec.get_bit(model.pred, MODELPREC)
+                // @ts-ignore
+                c = (c << 1) | bit
+                model.update(bit)
+            })
+
+            words.push(c)
+            model.context = c
+        })
+        return words
     }
 }

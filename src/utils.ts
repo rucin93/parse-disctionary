@@ -180,7 +180,7 @@ export function encodeBqV1(
   while (!(vv = tryOnce())) {}
 
   const ret = [];
-  console.log(vv.length)
+  // console.log(vv.length)
   vv.forEach((val) => {
     // @ts-ignore
     const { v, n, widen } = val;
@@ -204,6 +204,10 @@ export function ord (c:string):number {
 
 export function range (length: number):Array<number> {
   return Object.keys([...new Array(length)]).map(Number)
+}
+
+export function byteSize (str:string) :number{
+  return new Blob([str]).size;
 }
 
 export const INVALID_OFFSETS_V2 = {13: 0x80, 36: 0x100, 92: 0x180, 96: 0x200}
