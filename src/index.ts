@@ -21,14 +21,6 @@ export default function parseCode(words: string, splitFunc = a => a.split(`\n`))
 }
 
 
-console.log(parseCode(`asd
-fsda
-fdsa
-sd
-asd
-asd`).v1.code)
-
-
 
 
 
