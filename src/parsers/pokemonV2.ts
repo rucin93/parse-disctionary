@@ -1,48 +1,15 @@
 import {MODELMAXCOUNT, MODELPREC} from "../models";
-import {encode_bq_v2, minify, ord, prefixLen, quotes, range} from "../utils";
+import {encode_bq_v2, minify, prefix_code, quotes, token_to_bit} from "../utils";
 import {RANS_DECODER, RANS_ENCODER} from "../rANS";
 
 export function pokemonV2(wordlist: Array<string>): string {
-    let MAXPREFIXLEN = 4
-
-    const prefix_code = wordlist => {
-        let s = ''
-        let prev = ''
-        wordlist.forEach(w => {
-            const num = Math.min(prefixLen(prev, w), MAXPREFIXLEN)
-            s += String.fromCharCode(num) + w.slice(num)
-            prev = w
-        })
-
-        return s.slice(1) + '\0'
-    }
-
-    const token_to_bit = (c) => {
-        if (('\0' <= c) && (c <= '\x1f')) {
-            return {
-                token: ord(c),
-                special: ''
-            }
-        } else if (('a' <= c) && (c <= 'z')) {
-            return {
-                token: ord(c) - ord('a') + MAXPREFIXLEN + 2,
-                special: ''
-            }
-        } else {
-            return {
-                token: MAXPREFIXLEN + 1,
-                special: c
-            }
-        }
-
-    }
-
+    const MAXPREFIXLEN = 4
     const CODEBITS = 5
     const tokens = []
     let specials = ''
 
-    prefix_code(wordlist).split('').forEach(c => {
-        const {token, special} = token_to_bit(c)
+    prefix_code(wordlist, MAXPREFIXLEN).split('').forEach(c => {
+        const {token, special} = token_to_bit(c, MAXPREFIXLEN)
         tokens.push(token)
         specials += special
     })

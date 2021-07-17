@@ -61,7 +61,7 @@ export class context_model_v1 {
     context: number
 
     constructor(model_class, charbits, order) {
-        this.models = range(1 << (charbits * order) + 1).map(i => new model_class(charbits))
+        this.models = range(1 << (charbits * order) + 1).map(() => new model_class(charbits))
         this.context = 0
     }
 
@@ -79,6 +79,5 @@ export class context_model_v1 {
         const temp = assert( (0 <= this.context) &&  (this.context < this.models.length), `this.context`)
         temp && this.models[this.context].update(bit)
     }
-
 }
 

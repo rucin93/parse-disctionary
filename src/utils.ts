@@ -1,4 +1,4 @@
-import { readFileSync } from 'fs'
+import { readFileSync, writeFileSync } from 'fs'
 
 interface item {
   v: any;
@@ -11,22 +11,8 @@ export function readLinesFromFile(filePath: string, separator: string = '\n'): A
   return readFileSync(filePath).toString().split(separator)
 }
 
-export function createTestDictionary(length: number, minWordLength: number,  separator: string = '\n'): string {
-  let temp = ``
-  for(let i = 0; i < length; i++) {
-    // @ts-ignore
-    const stringLength = !!( Math.random() + minWordLength ) * 4
-    for(let j = minWordLength; j < stringLength; j++) {
-      const number = (Math.random() * ('a'.charCodeAt(0) - 'z'.charCodeAt(0))) + 'a'.charCodeAt(0)
-      temp += String.fromCharCode(number)
-    }
-
-    if (i + 1 !== length) {
-      temp += separator
-    }
-  }
-
-  return temp
+export function writeToFile(filePath: string, content: string) {
+  writeFileSync(filePath, content)
 }
 
 export function assert(condition: boolean, message: string): boolean {
@@ -206,7 +192,7 @@ export function range (length: number):Array<number> {
   return Object.keys([...new Array(length)]).map(Number)
 }
 
-export function byteSize (str:string) :number{
+export function byteSize (str:string):number {
   return new Blob([str]).size;
 }
 
@@ -216,7 +202,7 @@ export function encode_bq_v2(buf) {
   const ret = []
   let offset = 0
   buf.forEach(v => {
-    if(assert((0 <= v) && (v < 128), '')) {
+    if (assert((0 <= v) && (v < 128), '')) {
       if (offset) {
         ret.push(offset + v)
         offset = 0
@@ -227,6 +213,38 @@ export function encode_bq_v2(buf) {
       }
     }
   })
-  assert( offset == 0, 'suboptimal encoding, put more padding bits to solve this issue')
-  return ret.map(e=> String.fromCodePoint(e)).join('')
+  assert ( offset === 0, 'suboptimal encoding, put more padding bits to solve this issue')
+  return ret.map(e => String.fromCodePoint(e)).join('')
+}
+
+export function token_to_bit (c, MAXPREFIXLEN) {
+  if (('\0' <= c) && (c <= '\x1f')) {
+    return {
+      token: ord(c),
+      special: ''
+    }
+  } else if (('a' <= c) && (c <= 'z')) {
+    return {
+      token: ord(c) - ord('a') + MAXPREFIXLEN + 2,
+      special: ''
+    }
+  } else {
+    return {
+      token: MAXPREFIXLEN + 1,
+      special: c
+    }
+  }
+
+}
+
+export function prefix_code( wordlist, MAXPREFIXLEN) {
+  let s = ''
+  let prev = ''
+  wordlist.forEach(w => {
+    const num = Math.min(prefixLen(prev, w), MAXPREFIXLEN)
+    s += String.fromCharCode(num) + w.slice(num)
+    prev = w
+  })
+
+  return s.slice(1) + '\0'
 }
