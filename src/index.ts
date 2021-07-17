@@ -25,7 +25,8 @@ console.log(parseCode(`asd
 fsda
 fdsa
 sd
-asd`).v2.code)
+asd
+asd`).v1.code)
 
 
 

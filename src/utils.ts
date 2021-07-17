@@ -50,16 +50,14 @@ export function prefixLen(a: string, b: string): number {
 }
 
 export function encodeBits(v: number, nbits: number): Array<number> {
-  const val = assert(v >> (nbits + 1) === 0, `(${v}, ${nbits + 1})`);
-  return val && [...Array(nbits).keys()].reverse().map((i) => (v >> i) & 1);
+  return ( v >> (nbits + 1) === 0 ) && [...Array(nbits).keys()].reverse().map((i) => (v >> i) & 1);
 }
 
 export function decodeBits(bits: any): number {
   let v = 0;
   bits.forEach(b => {
     const c = parseInt(b);
-    const val = assert(c === 0 || c === 1, 'c === 0 || c === 1 '+ b);
-    val && (v = (v << 1) | parseInt(b));
+    (c === 0 || c === 1) && (v = (v << 1) | c);
   })
 
   return v;
@@ -127,9 +125,7 @@ export function encodeBqV1(
       let i = vv.length - 1;
 
       while (true) {
-        assert(i >= 0, "i >= 0 " + i);
         if(i >= 0) {
-
         let {v, n, widen } = vv[i];
         const nn = widen ? nfullbits : 7;
         if (n < nn) {
@@ -138,8 +134,7 @@ export function encodeBqV1(
           n += m;
 
           if (n === nn && !(widen || validByte(v))) {
-            const val = assert(!widen, 'widen ' + widen);
-            val && widen_offsets.add(i);
+            !widen && widen_offsets.add(i);
             return null;
           }
 
@@ -175,8 +170,7 @@ export function encodeBqV1(
     } else {
       let w = v | (0b1111111 >> n << n)
       if (!validByte(w)) {
-        const f = assert(validByte(v), "validByte  " + v);
-        f && (w = v);
+        validByte(v) && (w = v);
       }
       ret.push(String.fromCharCode(w));
     }
@@ -202,7 +196,7 @@ export function encode_bq_v2(buf) {
   const ret = []
   let offset = 0
   buf.forEach(v => {
-    if (assert((0 <= v) && (v < 128), '')) {
+    if ((0 <= v) && (v < 128)) {
       if (offset) {
         ret.push(offset + v)
         offset = 0

@@ -1,4 +1,4 @@
-import {assert, range} from "./utils";
+import { range } from "./utils";
 
 export const MODELPREC = 16
 export const MODELMAXCOUNT = 63
@@ -24,7 +24,7 @@ export class bitwise_model_v1 {
             this.count += 1
         }
         const delta = ((bit << MODELPREC) - this.pred) * DIVCOUNT[this.count]
-        if (assert((-0x80000000 <= delta) && (delta <= 0x7fffffff), 'delta')) {
+        if ((-0x80000000 <= delta) && (delta <= 0x7fffffff)) {
             this.pred += (delta) >> MODELPREC
         }
     }
@@ -68,7 +68,6 @@ export class context_model_v1 {
     reset() {
         this.models.forEach(model => model.reset())
         this.context = 0
-
     }
 
     get pred() {
@@ -76,8 +75,7 @@ export class context_model_v1 {
     }
 
     update(bit) {
-        const temp = assert( (0 <= this.context) &&  (this.context < this.models.length), `this.context`)
-        temp && this.models[this.context].update(bit)
+        (0 <= this.context) && (this.context < this.models.length) && this.models[this.context].update(bit)
     }
 }
 

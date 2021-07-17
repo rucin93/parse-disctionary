@@ -32,7 +32,7 @@ export class RANS_ENCODER {
     }
 
     put_back(start, freq, scale) {
-        if (assert( freq > 0 , 'freq > 0')) {
+        if ( freq > 0 ) {
             let st = this.st
             let stMax = (RANS_L >> scale << 7) * freq
             while (st >= stMax) {
